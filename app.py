@@ -6,7 +6,7 @@ import shap
 import matplotlib.pyplot as plt
 
 # 开启宽屏模式，完美适配并排布局
-st.set_page_config(page_title="Prediction Model", layout="wide")
+st.set_page_config(page_title="College Psychiatric Referral Predictor", layout="wide")
 
 @st.cache_resource
 def load_models():
@@ -23,8 +23,8 @@ except Exception:
     st.error("Model components not found. Please ensure all 5 .pkl files are in the directory.")
     st.stop()
 
-# 【修改点 1】：大标题将 Hospitalization 替换为 Clinical Intervention
-st.markdown("<h1 style='text-align: center;'>Prediction Model for Clinical Intervention Risk</h1>", unsafe_allow_html=True)
+# Revised title: conservative research-prototype wording
+st.markdown("<h1 style='text-align: center;'>College Psychiatric Referral Predictor (Research Prototype)</h1>", unsafe_allow_html=True)
 st.write("")
 
 # SCL-90 核心特征官方英文精简对照表 (基于 SCL-90 国际标准原版)
@@ -70,7 +70,7 @@ st.write("")
 # 居中放置评估按钮
 col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
-    predict_btn = st.button("Start Predict", use_container_width=True)
+    predict_btn = st.button("Calculate score", use_container_width=True)
 
 if predict_btn:
     input_df = pd.DataFrame([user_inputs], columns=features)
@@ -90,8 +90,8 @@ if predict_btn:
     
     st.markdown("---")
     
-    # 【修改点 2】：概率提示语将 hospitalization risk 替换为 requiring clinical psychiatric intervention
-    st.markdown(f"<div style='text-align: center; font-size: 50px; font-weight: 900; color: #1f77b4; margin-bottom: 20px;'>The predicted probability of requiring clinical psychiatric intervention is {risk_prob * 100:.1f}%.</div>", unsafe_allow_html=True)
+    # Revised probability label: cohort-reference wording
+    st.markdown(f"<div style='text-align: center; font-size: 50px; font-weight: 900; color: #1f77b4; margin-bottom: 20px;'>The model-estimated likelihood of belonging to the clinically diagnosed reference cohort is {risk_prob * 100:.1f}%.</div>", unsafe_allow_html=True)
     
     # 静态高清红蓝力图（缩小字号并拉宽画布，防止文字重叠）
     plt.clf() 
@@ -102,7 +102,7 @@ if predict_btn:
         shap_val, 
         input_df.iloc[0], 
         feature_names=features,
-        out_names="Risk",
+        out_names="Cohort similarity score",
         matplotlib=True, 
         show=False
     )
@@ -116,11 +116,10 @@ if predict_btn:
     
     # 临床干预建议（45px极大化字号，去前缀，二元绝对分流）
     if risk_prob < threshold:
-        # 【修改点 3】：低风险建议，加了一个 Routine，显得更专业
-        st.markdown("<div style='text-align: center; font-size: 45px; font-weight: 900; color: #2e7d32;'>Routine on-campus psychological counseling</div>", unsafe_allow_html=True)
+        # Revised lower-score message: avoid direct clinical instruction
+        st.markdown("<div style='text-align: center; font-size: 45px; font-weight: 900; color: #2e7d32;'>Lower model-estimated referral priority; consider routine campus support and clinical judgment</div>", unsafe_allow_html=True)
     else:
-        # 【修改点 4】：高风险建议，从泛泛的 Timely medical treatment 升级为专业的 Immediate psychiatric referral
-        st.markdown("<div style='text-align: center; font-size: 45px; font-weight: 900; color: #d32f2f;'>Immediate psychiatric referral</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center; font-size: 45px; font-weight: 900; color: #d32f2f;'>Higher model-estimated referral priority; consider professional mental health assessment</div>", unsafe_allow_html=True)
     
     # 底部的免责声明
-    st.markdown("<p style='text-align: center; font-size: 14px; color: gray; margin-top: 30px;'>The evaluation results are for clinical screening and university management reference only, and cannot replace formal face-to-face diagnosis by a professional psychiatrist.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 14px; color: gray; margin-top: 30px;'>This research prototype supports post-screening risk stratification only. It is not a diagnostic tool, does not determine whether clinical intervention is required, and cannot replace face-to-face assessment by a qualified mental health professional.</p>", unsafe_allow_html=True)
